@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    component: elk
+    role: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: elk
+      role: kibana
+  template:
+    metadata:
+      labels:
+        component: elk
+        role: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana-oss:6.3.1
+        env:
+        - name: CLUSTER_NAME
+          value: myesdb
+        resources:
+          limits:
+            cpu: 0.2
+          requests:
+            cpu: 0.1
+        ports:
+        - containerPort: 5601
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /opt/kibana/config
+      volumes:
+      - name : config
+        configMap:
+          name: kibana-config
+          items:
+          - key: kibana.yml
+            path: kibana.yml
