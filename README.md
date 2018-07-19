@@ -1,4 +1,4 @@
-#K8S EFK
+# K8S EFK
 EFK stack deployment on top of kubernetes infrastructure un built in fluent bit  
 Note that it should work on minikube.
 
