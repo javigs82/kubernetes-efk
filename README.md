@@ -18,17 +18,17 @@ minikube start --vm-driver kvm2 --memory 6144 --cpus 3
 
 * The data pods are deployed as a `StatefulSet`. These use a `volumeClaimTemplates` to provision persistent storage for each pod.
 
-* The number of replicas per node should be set up in function of ecosystem's requirements. Just adjust `spec.replicas` in deployment specification files (`es-master.yaml`, `es-data.yaml`, `es-ingest.yaml`)
+* The number of replicas per node should be set up in function of ecosystem's requirements. Just adjust `spec.replicas` in deployment specification files.
 
 ## Pre-requisites
 
-* `minikube` installed
+* `minikube` installed.
 
-* `kubectl` configured to access the cluster master API Server
+* `kubectl` configured to access the cluster master API Server.
 
 ## Build images
 
-The project uses base images provided by elastic [Docker @ Elastic](https://www.docker.elastic.co/)
+The project uses base images provided by elastic [Docker @ Elastic](https://www.docker.elastic.co/).
 
 ## Deploy
 
@@ -52,11 +52,13 @@ kctl apply -f es-full.yaml
 ```
 
 Create the ingress auth:
+
 ```
 sh generate_ingress_auth.sh [user] [namespace]
 ```
 
-For local purpose, remember modify /etc/hosts to point to your minikube ip
+For local purpose, remember modify /etc/hosts to point to your minikube ip:
+
 ```
 vi /etc/hosts 
 ```
@@ -93,13 +95,6 @@ kctl apply -f kibana-configmap.yaml
 kctl apply -f kibana-svc.yaml
 kctl apply -f kibana.yaml
 ```
-
-Kibana will be available through service `kibana`, and one will be able to access it from within the cluster or doing `port-forwarding`, as follows:
-
-```
-kctl port-forward svc/kibana 80:80
-```
-
 There is also an Ingress-Nginx to expose the service publicly or simply use the service nodeport.
 In the case one proceeds to do so, one must change the environment variable `server.basePath` in `kibana-config-map.yaml` to the match their environment.
 
