@@ -8,7 +8,7 @@ metadata:
     role: full
 spec:
   serviceName: elasticsearch
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       component: elasticsearch
@@ -34,9 +34,10 @@ spec:
         resources:
           limits:
             cpu: 1
+            memory: "1548Mi"
           requests:
-            cpu: 1
-            memory: "768Mi"
+            cpu: 0.3
+            memory: "1Gi"
         ports:
         - containerPort: 9300
           name: transport
@@ -51,10 +52,18 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CLUSTER_NAME
-          value: myesdb
+        - name: NUMBER_OF_MASTERS
+          value: "2"
+        - name: NODE_MASTER
+          value: "true"
+        - name: NODE_INGEST
+          value: "true"
+        - name: NODE_DATA
+          value: "true"
+        - name: HTTP_ENABLE
+          value: "true"
         - name: ES_JAVA_OPTS
-          value: -Xms512m -Xmx512m
+          value: -Xms1g -Xmx1g
         - name: NETWORK_HOST
           value: _site_,_lo_
         - name: NUMBER_OF_MASTERS
