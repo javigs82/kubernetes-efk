@@ -1,10 +1,11 @@
-#K8S EFK
-EFK stack deployment on top of kubernetes infrastructure un built in fluent bit  
-Note that it should work on minikube.
+# K8S EFK
+EFK stack deployment in kubernetes and built with fluent bit  
 
 ### Deployment
 The deployment is done on the “logging” namespace and there is a script to automate it and tear it down. 
 There are a set of manifest (`es-full.yaml`,`es-full-svc.yaml`) to deploy a three-node (could be changed in the `replicas` parameter) scenario where every node contains all functionality (master, data and ingest).
+
+Note that it should work on minikube.
 
 
 ### Minikube
@@ -17,8 +18,6 @@ minikube start --vm-driver kvm2 --memory 6144 --cpus 3
 ## Notes
 
 * The data pods are deployed as a `StatefulSet`. These use a `volumeClaimTemplates` to provision persistent storage for each pod.
-
-* The number of replicas per node should be set up in function of ecosystem's requirements. Just adjust `spec.replicas` in deployment specification files (`es-master.yaml`, `es-data.yaml`, `es-ingest.yaml`)
 
 ## Pre-requisites
 
@@ -44,7 +43,7 @@ alias kctl='kubectl --namespace logging'
 kctl apply -f es-configmap.yaml
 ```
 
-To have a three-node cluster with all roles, use this:
+To have a full cluster with all roles, use this:
 
 ```
 kctl apply -f es-full-svc.yaml
@@ -72,15 +71,7 @@ Adjust the domains and need for these ingresses according to the proper environm
 
 *Don't forget* that services in Kubernetes are only acessible from containers in the cluster. For different behavior one should [configure the creation of an external load-balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer) or use an ingress as currently included in the project.
 
-*Note:* if you are using one of the cloud providers which support external load balancers, setting the type field to "LoadBalancer" will provision a load balancer for your Service. You can uncomment the field in `es-svc.yaml`.
-
-## Availability
-
-If one wants to ensure that no more than `n` Elasticsearch nodes will be unavailable at a time, one can optionally (change and) apply the following manifests:
-```
-kubectl create -f es-master-pdb.yaml
-kubectl create -f es-data-pdb.yaml
-```
+*Note:* if you are using one of the cloud providers which support external load balancers, setting the type field to "LoadBalancer" will provision a load balancer for your Service.
 
 ## Kibana
 
@@ -127,3 +118,55 @@ The default value for this environment variable is 2, meaning a cluster will nee
 Read a different config file by settings env var `ES_PATH_CONF=/path/to/my/config/` [(see the Elasticsearch docs for more)](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html#config-files-location) or edit the provided ConfigMap.
 
 
+## Troubleshooting
+
+### No up-and-running site-local
+
+One of the errors one may come across when running the setup is the following error:
+```
+[2018-08-29T01:28:36,515][WARN ][o.e.b.ElasticsearchUncaughtExceptionHandler] [] uncaught exception in thread [main]
+org.elasticsearch.bootstrap.StartupException: java.lang.IllegalArgumentException: No up-and-running site-local (private) addresses found, got [name:lo (lo), name:eth0 (eth0)]
+	at org.elasticsearch.bootstrap.Elasticsearch.init(Elasticsearch.java:116) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.bootstrap.Elasticsearch.execute(Elasticsearch.java:103) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.cli.SettingCommand.execute(SettingCommand.java:54) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.cli.Command.mainWithoutErrorHandling(Command.java:96) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.cli.Command.main(Command.java:62) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:80) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:73) ~[elasticsearch-5.0.1.jar:5.0.1]
+Caused by: java.lang.IllegalArgumentException: No up-and-running site-local (private) addresses found, got [name:lo (lo), name:eth0 (eth0)]
+	at org.elasticsearch.common.network.NetworkUtils.getSiteLocalAddresses(NetworkUtils.java:187) ~[elasticsearch-5.0.1.jar:5.0.1]
+	at org.elasticsearch.common.network.NetworkService.resolveInternal(NetworkService.java:246) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.common.network.NetworkService.resolveInetAddresses(NetworkService.java:220) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.common.network.NetworkService.resolveBindHostAddresses(NetworkService.java:130) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.transport.TcpTransport.bindServer(TcpTransport.java:575) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.transport.netty4.Netty4Transport.doStart(Netty4Transport.java:182) ~[?:?]
+ 	at org.elasticsearch.common.component.AbstractLifecycleComponent.start(AbstractLifecycleComponent.java:68) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.transport.TransportService.doStart(TransportService.java:182) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.common.component.AbstractLifecycleComponent.start(AbstractLifecycleComponent.java:68) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.node.Node.start(Node.java:525) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.bootstrap.Bootstrap.start(Bootstrap.java:211) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.bootstrap.Bootstrap.init(Bootstrap.java:288) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	at org.elasticsearch.bootstrap.Elasticsearch.init(Elasticsearch.java:112) ~[elasticsearch-5.0.1.jar:5.0.1]
+ 	... 6 more
+[2016-11-29T01:28:37,448][INFO ][o.e.n.Node               ] [kIEYQSE] stopping ...
+[2016-11-29T01:28:37,451][INFO ][o.e.n.Node               ] [kIEYQSE] stopped
+[2016-11-29T01:28:37,452][INFO ][o.e.n.Node               ] [kIEYQSE] closing ...
+[2016-11-29T01:28:37,464][INFO ][o.e.n.Node               ] [kIEYQSE] closed
+```
+
+This is related to how the container binds to network ports (defaults to ``_local_``). It will need to match the actual node network interface name, which depends on what OS and infrastructure provider one uses. For instance, if the primary interface on the node is `p1p1` then that is the value that needs to be set for the `NETWORK_HOST` environment variable.
+Please see [the documentation](https://github.com/pires/docker-elasticsearch#environment-variables) for reference of options.
+
+In order to workaround this, set `NETWORK_HOST` environment variable in the pod descriptors as follows:
+```yaml
+- name: "NETWORK_HOST"
+  value: "_eth0_" #_p1p1_ if interface name is p1p1, _ens4_ if interface name is ens4, and so on.
+```
+
+## Acknowledges
+
+This repo is a customization of a [@pires' project](https://github.com/pires/kubernetes-elasticsearch-cluster) published in github. Thanks for this amazing job.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details
