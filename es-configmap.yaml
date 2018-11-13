@@ -2,7 +2,7 @@ apiVersion: v1
 data:
   elasticsearch.yml: |
     cluster:
-      name: ${CLUSTER_NAME}
+      name: elasticsearch-cluster
     node:
       master: ${NODE_MASTER}
       data: ${NODE_DATA}
@@ -20,11 +20,11 @@ data:
       enabled: ${HTTP_ENABLE}
       compression: true
       cors:
-        enabled: ${HTTP_CORS_ENABLE}
-        allow-origin: ${HTTP_CORS_ALLOW_ORIGIN}
+        enabled: true
+        allow-origin: "*"
     discovery:
       zen:
-        ping.unicast.hosts: ${DISCOVERY_SERVICE}
+        ping.unicast.hosts: elasticsearch-discovery
         minimum_master_nodes: ${NUMBER_OF_MASTERS}
     #xpack.license.self_generated.type: basic
     #xpack.security.enabled: false
