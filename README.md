@@ -1,10 +1,6 @@
 # K8S EFK
-<<<<<<< HEAD
+
 EFK stack deployment in kubernetes and built with fluent bit  
-=======
-ElasticFluentbitKibana stack deployment on top of kubernetes infrastructure built in fluent bit  
-Note that it should work on minikube.
->>>>>>> bafc45ad720d4fb168272beb6d6a2af0e624baae
 
 ### Deployment
 The deployment is done on the “logging” namespace and there is a script to automate it and tear it down. 
@@ -24,11 +20,8 @@ minikube start --vm-driver kvm2 --memory 6144 --cpus 3
 
 * The data pods are deployed as a `StatefulSet`. These use a `volumeClaimTemplates` to provision persistent storage for each pod.
 
-<<<<<<< HEAD
-=======
 * The number of replicas per node should be set up in function of ecosystem's requirements. Just adjust `spec.replicas` in deployment specification files.
 
->>>>>>> bafc45ad720d4fb168272beb6d6a2af0e624baae
 ## Pre-requisites
 
 * `minikube` installed.
