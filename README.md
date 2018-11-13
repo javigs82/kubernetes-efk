@@ -1,5 +1,10 @@
 # K8S EFK
+<<<<<<< HEAD
 EFK stack deployment in kubernetes and built with fluent bit  
+=======
+ElasticFluentbitKibana stack deployment on top of kubernetes infrastructure built in fluent bit  
+Note that it should work on minikube.
+>>>>>>> bafc45ad720d4fb168272beb6d6a2af0e624baae
 
 ### Deployment
 The deployment is done on the “logging” namespace and there is a script to automate it and tear it down. 
@@ -19,15 +24,20 @@ minikube start --vm-driver kvm2 --memory 6144 --cpus 3
 
 * The data pods are deployed as a `StatefulSet`. These use a `volumeClaimTemplates` to provision persistent storage for each pod.
 
+<<<<<<< HEAD
+=======
+* The number of replicas per node should be set up in function of ecosystem's requirements. Just adjust `spec.replicas` in deployment specification files.
+
+>>>>>>> bafc45ad720d4fb168272beb6d6a2af0e624baae
 ## Pre-requisites
 
-* `minikube` installed
+* `minikube` installed.
 
-* `kubectl` configured to access the cluster master API Server
+* `kubectl` configured to access the cluster master API Server.
 
 ## Build images
 
-The project uses base images provided by elastic [Docker @ Elastic](https://www.docker.elastic.co/)
+The project uses base images provided by elastic [Docker @ Elastic](https://www.docker.elastic.co/).
 
 ## Deploy
 
@@ -51,11 +61,13 @@ kctl apply -f es-full.yaml
 ```
 
 Create the ingress auth:
+
 ```
 sh generate_ingress_auth.sh [user] [namespace]
 ```
 
-For local purpose, remember modify /etc/hosts to point to your minikube ip
+For local purpose, remember modify /etc/hosts to point to your minikube ip:
+
 ```
 vi /etc/hosts 
 ```
@@ -84,13 +96,6 @@ kctl apply -f kibana-configmap.yaml
 kctl apply -f kibana-svc.yaml
 kctl apply -f kibana.yaml
 ```
-
-Kibana will be available through service `kibana`, and one will be able to access it from within the cluster or doing `port-forwarding`, as follows:
-
-```
-kctl port-forward svc/kibana 80:80
-```
-
 There is also an Ingress-Nginx to expose the service publicly or simply use the service nodeport.
 In the case one proceeds to do so, one must change the environment variable `server.basePath` in `kibana-config-map.yaml` to the match their environment.
 
@@ -116,7 +121,6 @@ The default value for this environment variable is 2, meaning a cluster will nee
 
 ### How can I customize `elasticsearch.yaml`?
 Read a different config file by settings env var `ES_PATH_CONF=/path/to/my/config/` [(see the Elasticsearch docs for more)](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html#config-files-location) or edit the provided ConfigMap.
-
 
 ## Troubleshooting
 
