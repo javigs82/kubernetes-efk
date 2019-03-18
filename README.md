@@ -160,9 +160,13 @@ In order to workaround this, set `NETWORK_HOST` environment variable in the pod 
   value: "_eth0_" #_p1p1_ if interface name is p1p1, _ens4_ if interface name is ens4, and so on.
 ```
 
-## Acknowledges
+## Author
 
-This repo is a customization of a [@pires' project](https://github.com/pires/kubernetes-elasticsearch-cluster) published in github. Thanks for this amazing job.
+* javigs82 [github](https://github.com/javigs82/)
+
+### Acknowledges
+
+This repo is a customization of a [@pires' project](https://github.com/pires/kubernetes-elasticsearch-cluster) based on official images. Thanks for this amazing job.
 
 ## License
 
