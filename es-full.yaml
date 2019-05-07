@@ -8,7 +8,7 @@ metadata:
     role: full
 spec:
   serviceName: elasticsearch
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       component: elasticsearch
@@ -30,14 +30,14 @@ spec:
           privileged: true
       containers:
       - name: es-full
-        image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.1
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.0.1
         resources:
           limits:
-            cpu: 1
-            memory: "1548Mi"
+            cpu: 1.2
+            memory: "1512Mi"
           requests:
-            cpu: 0.3
-            memory: "1Gi"
+            cpu: 0.5
+            memory: "1024Mi"
         ports:
         - containerPort: 9300
           name: transport
@@ -52,22 +52,22 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: INITIAL_MASTER_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: NUMBER_OF_MASTERS
-          value: "2"
+          value: "1"
         - name: NODE_MASTER
           value: "true"
         - name: NODE_INGEST
           value: "true"
         - name: NODE_DATA
           value: "true"
-        - name: HTTP_ENABLE
-          value: "true"
         - name: ES_JAVA_OPTS
           value: -Xms1g -Xmx1g
         - name: NETWORK_HOST
           value: _site_,_lo_
-        - name: NUMBER_OF_MASTERS
-          value: "1"
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:
@@ -86,7 +86,7 @@ spec:
           periodSeconds: 10
         volumeMounts:
         - name: config
-          mountPath: /elasticsearch/config/elasticsearch.yml
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
           subPath: elasticsearch.yml
         - name: storage-full
           mountPath: /data
@@ -111,6 +111,7 @@ spec:
       name: storage-full
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard
       resources:
         requests:
-          storage: 20Gi
+          storage: 10Gi

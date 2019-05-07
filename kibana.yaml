@@ -19,15 +19,17 @@ spec:
     spec:
       containers:
       - name: kibana
-        image: docker.elastic.co/kibana/kibana-oss:6.3.1
+        image: docker.elastic.co/kibana/kibana-oss:7.0.1
         env:
         - name: CLUSTER_NAME
-          value: myesdb
+          value: elasticsearch-cluster
         resources:
           limits:
             cpu: 0.2
+            memory: "512Mi"
           requests:
             cpu: 0.1
+            memory: "256Mi"
         ports:
         - containerPort: 5601
           name: http

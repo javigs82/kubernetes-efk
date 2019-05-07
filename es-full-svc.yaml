@@ -24,7 +24,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 30m
 spec:
   rules:
-  - host: javiergs.me
+  - host: javigs82.me
     http:
       paths:
       - path: /elasticsearch

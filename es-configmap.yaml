@@ -3,29 +3,29 @@ data:
   elasticsearch.yml: |
     cluster:
       name: elasticsearch-cluster
+      initial_master_nodes: ${INITIAL_MASTER_NODE}
     node:
       master: ${NODE_MASTER}
       data: ${NODE_DATA}
       name: ${NODE_NAME}
       ingest: ${NODE_INGEST}
-      max_local_storage_nodes: ${MAX_LOCAL_STORAGE_NODES}
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html#max-local-storage-nodes
+      max_local_storage_nodes: 1
     processors: ${PROCESSORS:1}
-    network.host: ${NETWORK_HOST}
+    network.host: ${NETWORK_HOST:_eth0_}
     path:
       data: /data/data
       logs: /data/log
     bootstrap:
-      memory_lock: ${MEMORY_LOCK}
+      # Kubernetes requires swap is turned off, so memory lock is redundant
+      memory_lock: false
     http:
-      enabled: ${HTTP_ENABLE}
       compression: true
       cors:
         enabled: true
         allow-origin: "*"
     discovery:
-      zen:
-        ping.unicast.hosts: elasticsearch-discovery
-        minimum_master_nodes: ${NUMBER_OF_MASTERS}
+      seed_hosts: elasticsearch-discovery
     #xpack.license.self_generated.type: basic
     #xpack.security.enabled: false
     #xpack.monitoring.enabled: false
@@ -37,3 +37,4 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   name: es-configmap
+  namespace: logging
