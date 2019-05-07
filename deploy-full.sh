@@ -10,17 +10,17 @@ kctl() {
 }
 # alias kctl='kubectl --namespace logging'
 
-# Deploy Elasticsearch service
+# Deploy Elasticsearch
 kctl apply -f es-configmap.yaml
-
-# Deploy Elasticsearch master node and wait until it's up
-kctl apply -f es-full.yaml
-
-# Deploy Elasticsearch data node and wait until it's up
 kctl apply -f es-full-svc.yaml
+kctl apply -f es-full.yaml
+#improve, but it does not work at this moment. Try in the future
+#kubectl wait --for=condition=Ready statefulset/es-full
+#Pod Disruption
+kctl apply -f es-pdb.yaml
 
 
-# Deploy Kibana
+#Deploy Kibana
 kctl apply -f kibana-configmap.yaml
 kctl apply -f kibana-svc.yaml
 kctl apply -f kibana.yaml
