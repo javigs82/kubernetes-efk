@@ -17,10 +17,16 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
+        storage.path              /var/log/flb-storage/
+        storage.sync              normal
+        storage.checksum          off
+        storage.backlog.mem_limit 50M
 
     @INCLUDE input-kubernetes.conf
+    @INCLUDE input-dummy.conf
     @INCLUDE filter-kubernetes.conf
     @INCLUDE output-elasticsearch.conf
+    @INCLUDE output-dummy-es.conf
 
   input-kubernetes.conf: |
     [INPUT]
@@ -29,17 +35,38 @@ data:
         Path              /var/log/containers/*.log
         Parser            docker
         DB                /var/log/flb_kube.db
-        Mem_Buf_Limit     5MB
+        Mem_Buf_Limit     50MB
         Skip_Long_Lines   On
         Refresh_Interval  10
+
+  input-dummy.conf: |
+    [INPUT]
+        Name              dummy
+        Tag               dummy.log
+        dummy             {"uuid": "javi-juan-jose-jacinto","customId": "juanitopiniera", "customrows":[{"key": "willifrog","value": "willyfrog.pdf" },{"key": "josua","value": "josua.pdf"}]}
 
   filter-kubernetes.conf: |
     [FILTER]
         Name                kubernetes
         Match               kube.*
-        Kube_URL            https://kubernetes.default.svc.cluster.local:443
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
         Merge_Log           On
         K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+
+  output-dummy-es.conf: |
+    [OUTPUT]
+        Name            es
+        Match           dummy.log
+        Host            ${FLUENT_ELASTICSEARCH_HOST}
+        Port            ${FLUENT_ELASTICSEARCH_PORT}
+        Logstash_Format off
+        Index           dummy-index
+        type            application-id
+        Replace_Dots    On
+        Retry_Limit     False
 
   output-elasticsearch.conf: |
     [OUTPUT]
@@ -48,6 +75,7 @@ data:
         Host            ${FLUENT_ELASTICSEARCH_HOST}
         Port            ${FLUENT_ELASTICSEARCH_PORT}
         Logstash_Format On
+        Replace_Dots    On
         Retry_Limit     False
 
   parsers.conf: |
@@ -91,7 +119,8 @@ data:
         Time_Keep   On
         # Command      |  Decoder | Field | Optional Action
         # =============|==================|=================
-        Decode_Field_As   escaped    log
+        Decode_Field_As   escaped_utf8    log    do_next
+        Decode_Field_As   json            log
 
     [PARSER]
         Name        syslog
