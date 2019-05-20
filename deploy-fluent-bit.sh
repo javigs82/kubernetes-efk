@@ -20,6 +20,6 @@ kctl apply -f fluent-bit-role-binding.yaml
 kctl apply -f fluent-bit-configmap.yaml
 
 #Create Daemon Set
-kctl apply -f fluent-bit-ds.yaml
+kctl apply -f fluent-bit-ds-minikube.yaml
 
 echo "done!"
